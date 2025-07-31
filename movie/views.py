@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from .models import Movie
+
 # Create your views here.
 
 def home(request):
@@ -9,4 +11,5 @@ def home(request):
     return render(request, 'home.html', {'name':'Sebastian Salazar'})
 
 def about(request):
-    return HttpResponse('About us')
+    #return HttpResponse('About us')
+    return render(request, 'about.html')
