@@ -8,7 +8,10 @@ from .models import Movie
 def home(request):
     #return HttpResponse('<h1>Welcome to Home Page<h1>')
     #return render(request, 'home.html')
-    return render(request, 'home.html', {'name':'Sebastian Salazar'})
+    #return render(request, 'home.html', {'name':'Sebastian Salazar'})
+    searchTerm = request.GET.get('searchMovie')
+    movies = Movie.objects.all()
+    return render(request, 'home.html', {'searchTerm':searchTerm, 'movies':movies})
 
 def about(request):
     #return HttpResponse('About us')
