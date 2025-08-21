@@ -80,3 +80,7 @@ def statistics_view(request):
 
     # Renderizar la plantilla stadistics.html con ambas gráficas
     return render(request, 'statistics.html', {'graphic_year': graphic_year, 'graphic_genre': graphic_genre})
+
+def signup(request):
+    email = request.GET.get('email')
+    return render(request, 'signup.html', {'email': email})
