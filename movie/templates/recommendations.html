@@ -1,0 +1,47 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card shadow-lg border-0">
+				<div class="card-header bg-primary text-white text-center">
+					<h2 class="mb-0">Recomendador de películas</h2>
+				</div>
+				<div class="card-body">
+					<form method="post" class="mb-4">
+						{% csrf_token %}
+						<div class="mb-3">
+							<label for="prompt" class="form-label">Describe lo que buscas:</label>
+							<input type="text" class="form-control" id="prompt" name="prompt" value="{{ prompt }}" required>
+						</div>
+						<div class="d-grid gap-2">
+							<button type="submit" class="btn btn-success btn-lg">Buscar recomendación</button>
+						</div>
+					</form>
+					{% if result %}
+						<div class="card mt-4 mx-auto" style="max-width: 500px;">
+							<div class="row g-0">
+								<div class="col-md-5 d-flex align-items-center justify-content-center bg-light">
+									<img src="/{{ result.image }}" alt="Imagen de la película" class="img-fluid rounded-start p-2" style="max-height: 220px;">
+								</div>
+								<div class="col-md-7">
+									<div class="card-body">
+										<h5 class="card-title fw-bold">{{ result.title }}</h5>
+										<p class="card-text">{{ result.description }}</p>
+										<ul class="list-group list-group-flush mb-2">
+											<li class="list-group-item"><strong>Género:</strong> {{ result.genre }}</li>
+											<li class="list-group-item"><strong>Año:</strong> {{ result.year }}</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

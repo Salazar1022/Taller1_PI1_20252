@@ -1,11 +1,21 @@
+from django.views.decorators.csrf import csrf_exempt
+
 from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Movie
+from openai import OpenAI
+from dotenv import load_dotenv
+from movie.models import Movie
 
-import io
+import io, os
 import matplotlib.pyplot as plt
 import matplotlib
 import urllib, base64
+import numpy as np
+
+load_dotenv('passwords/openAI.env')
+client = OpenAI(api_key=os.environ.get('openai_apikey'))
+
 
 # Create your views here.
 def home(request):
@@ -84,3 +94,53 @@ def statistics_view(request):
 def signup(request):
     email = request.GET.get('email')
     return render(request, 'signup.html', {'email': email})
+
+def recommendations(request):
+    result = None
+    prompt = ''
+    if request.method == 'POST':
+        prompt = request.POST.get('prompt', '')
+        if prompt:
+            response = client.embeddings.create(
+                input=[prompt],
+                model="text-embedding-3-small"
+            )
+            prompt_emb = np.array(response.data[0].embedding, dtype=np.float32)
+            best_movie = None
+            max_similarity = -1
+            for movie in Movie.objects.all():
+                if hasattr(movie, 'emb') and movie.emb:
+                    movie_emb = np.frombuffer(movie.emb, dtype=np.float32)
+                    similarity = cosine_similarity(prompt_emb, movie_emb)
+                    if similarity > max_similarity:
+                        max_similarity = similarity
+                        best_movie = movie
+            result = best_movie
+    return render(request, 'recommendations.html', {'result': result, 'prompt': prompt})
+
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+# Recibir el prompt del usuario (esto se debe recibir desde el formulario de la app)
+prompt = "película de la segunda guerra mundial"
+
+# Generar embedding del prompt
+response = client.embeddings.create(
+    input=[prompt],
+    model="text-embedding-3-small"
+)
+prompt_emb = np.array(response.data[0].embedding, dtype=np.float32)
+
+# Recorrer la base de datos y comparar
+best_movie = None
+max_similarity = -1
+
+for movie in Movie.objects.all():
+    movie_emb = np.frombuffer(movie.emb, dtype=np.float32)
+    similarity = cosine_similarity(prompt_emb, movie_emb)
+
+    if similarity > max_similarity:
+        max_similarity = similarity
+        best_movie = movie
+
+print(f"La película más similar al prompt es: {best_movie.title} con similitud {max_similarity:.4f}")
