@@ -13,7 +13,8 @@ import matplotlib
 import urllib, base64
 import numpy as np
 
-load_dotenv('passwords/openAI.env')
+load_dotenv('passwords/api_keys.env')
+
 client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
 
 
